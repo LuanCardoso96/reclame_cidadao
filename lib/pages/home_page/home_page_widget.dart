@@ -22,6 +22,12 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   late HomePageModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _isLoading = false;
+  bool _useBiometrics = false;
 
   @override
   void initState() {
@@ -39,12 +45,13 @@ class _HomePageWidgetState extends State<HomePageWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
       appBar: AppBar(
         backgroundColor: FlutterFlowTheme.of(context).primary,
         automaticallyImplyLeading: false,
         title: Text(
-          'Bem-vindo!',
+          'Login - Reclame Cidadão',
           style: FlutterFlowTheme.of(context).headlineMedium.override(
                 font: GoogleFonts.interTight(
                   fontWeight:
@@ -68,77 +75,194 @@ class _HomePageWidgetState extends State<HomePageWidget> {
       body: SafeArea(
         top: true,
         child: Center(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.account_circle,
-                    size: 80, color: FlutterFlowTheme.of(context).primary),
-                SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    icon: Icon(Icons.fingerprint, color: Colors.white),
-                    label: Text('Entrar com biometria',
-                        style: GoogleFonts.inter(fontSize: 18)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: FlutterFlowTheme.of(context).primary,
-                      padding: EdgeInsets.symmetric(vertical: 16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Icon(Icons.lock_outline,
+                      size: 80, color: FlutterFlowTheme.of(context).primary),
+                  SizedBox(height: 24),
+                  Text(
+                    'Bem-vindo de volta!',
+                    style: GoogleFonts.inter(
+                        fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Faça login para continuar',
+                    style: GoogleFonts.inter(
+                        fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 32),
+                  // Email
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'E-mail',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.email_outlined),
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/login');
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Digite seu e-mail';
+                      }
+                      return null;
                     },
                   ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
-                    label: Text('Entrar com Google',
-                        style: GoogleFonts.inter(fontSize: 16)),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                  SizedBox(height: 16),
+                  // Senha
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Senha',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/login');
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Digite sua senha';
+                      }
+                      return null;
                     },
                   ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon: Icon(Icons.person_add_alt,
-                        color: FlutterFlowTheme.of(context).primary, size: 28),
-                    label: Text('Criar novo usuário',
-                        style: GoogleFonts.inter(fontSize: 16)),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/register');
-                    },
+                  SizedBox(height: 8),
+                  // Checkbox biometria
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _useBiometrics,
+                        onChanged: (value) {
+                          setState(() {
+                            _useBiometrics = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('Entrar com biometria',
+                          style: GoogleFonts.inter(fontSize: 14)),
+                    ],
                   ),
-                ),
-                SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    icon:
-                        Icon(Icons.lock_reset, color: Colors.orange, size: 28),
-                    label: Text('Recuperar senha por e-mail',
-                        style: GoogleFonts.inter(fontSize: 16)),
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                  SizedBox(height: 8),
+                  // Esqueci a senha
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        // Navegar para tela de esqueci a senha
+                      },
+                      child: Text('Esqueci a senha?'),
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/forgot-password');
-                    },
                   ),
-                ),
-              ],
+                  SizedBox(height: 24),
+                  // Botão Login
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                // Fazer login
+                                setState(() {
+                                  _isLoading = true;
+                                });
+
+                                // Simular login (substitua pela autenticação real)
+                                Future.delayed(Duration(seconds: 2), () {
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                  // Navegar para tela de denúncias após login
+                                  Navigator.pushReplacementNamed(
+                                      context, '/denuncias');
+                                });
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: FlutterFlowTheme.of(context).primary,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: _isLoading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text('Entrar',
+                              style: GoogleFonts.inter(
+                                  fontSize: 18, color: Colors.white)),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  // Divisor
+                  Row(
+                    children: [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('ou',
+                            style: GoogleFonts.inter(color: Colors.grey[600])),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  // Login com Google
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon:
+                          Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
+                      label: Text('Entrar com Google',
+                          style: GoogleFonts.inter(fontSize: 16)),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        // Login Google
+                        setState(() {
+                          _isLoading = true;
+                        });
+
+                        // Simular login Google (substitua pela autenticação real)
+                        Future.delayed(Duration(seconds: 2), () {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          // Navegar para tela de denúncias após login
+                          Navigator.pushReplacementNamed(context, '/denuncias');
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  // Criar nova conta
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Não tem uma conta?'),
+                      TextButton(
+                        onPressed: () {
+                          // Navegar para tela de cadastro
+                          Navigator.pushNamed(context, '/register');
+                        },
+                        child: Text('Criar nova conta'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -17,6 +17,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _useBiometrics = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +35,18 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                   // Logo
                   Icon(Icons.lock_outline, size: 80, color: Colors.blueAccent),
                   SizedBox(height: 24),
+                  Text(
+                    'Bem-vindo de volta!',
+                    style: GoogleFonts.inter(
+                        fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Faça login para continuar',
+                    style: GoogleFonts.inter(
+                        fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 32),
                   // Email
                   TextFormField(
                     controller: _emailController,
@@ -78,17 +91,33 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                     },
                   ),
                   SizedBox(height: 8),
+                  // Checkbox biometria
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _useBiometrics,
+                        onChanged: (value) {
+                          setState(() {
+                            _useBiometrics = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('Entrar com biometria',
+                          style: GoogleFonts.inter(fontSize: 14)),
+                    ],
+                  ),
+                  SizedBox(height: 8),
                   // Esqueci a senha
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Navegar para tela de esqueci a senha
+                        Navigator.pushNamed(context, '/forgot-password');
                       },
                       child: Text('Esqueci a senha?'),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 24),
                   // Botão Login
                   SizedBox(
                     width: double.infinity,
@@ -100,11 +129,29 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                                 // Fazer login
                               }
                             },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
                       child: _isLoading
                           ? CircularProgressIndicator(color: Colors.white)
                           : Text('Entrar',
-                              style: GoogleFonts.inter(fontSize: 18)),
+                              style: GoogleFonts.inter(
+                                  fontSize: 18, color: Colors.white)),
                     ),
+                  ),
+                  SizedBox(height: 16),
+                  // Divisor
+                  Row(
+                    children: [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('ou',
+                            style: GoogleFonts.inter(color: Colors.grey[600])),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
                   ),
                   SizedBox(height: 16),
                   // Login com Google
@@ -115,22 +162,11 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                           Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
                       label: Text('Entrar com Google',
                           style: GoogleFonts.inter(fontSize: 16)),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
                       onPressed: () {
                         // Login Google
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Login com biometria
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: Icon(Icons.fingerprint,
-                          color: Colors.blueAccent, size: 28),
-                      label: Text('Entrar com digital',
-                          style: GoogleFonts.inter(fontSize: 16)),
-                      onPressed: () {
-                        // Login biometria
                       },
                     ),
                   ),
@@ -142,7 +178,7 @@ class _LoginPageWidgetState extends State<LoginPageWidget> {
                       Text('Não tem uma conta?'),
                       TextButton(
                         onPressed: () {
-                          // Navegar para tela de cadastro
+                          Navigator.pushNamed(context, '/register');
                         },
                         child: Text('Criar nova conta'),
                       ),

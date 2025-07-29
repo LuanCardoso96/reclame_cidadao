@@ -16,6 +16,7 @@ import '/index.dart';
 import '/pages/login_page/login_page_widget.dart';
 import '/pages/register_page/register_page_widget.dart';
 import '/pages/forgot_password/forgot_password_widget.dart';
+import '/pages/denuncias_page/denuncias_page_widget.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -69,6 +70,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: ForgotPasswordWidget.routeName,
           path: ForgotPasswordWidget.routePath,
           builder: (context, params) => ForgotPasswordWidget(),
+        ),
+        FFRoute(
+          name: DenunciasPageWidget.routeName,
+          path: DenunciasPageWidget.routePath,
+          builder: (context, params) => DenunciasPageWidget(),
         ),
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
